@@ -1,15 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column,  } from "typeorm";
 
-class CaracteristicaProduto {
-  nome: string;
-  descricao: string;
-}
-
-class ImagemProduto {
-  url: string;
-  descricao: string;
-}
-
 @Entity({ name: 'produtos'})
 export class ProdutoEntity {
     @PrimaryGeneratedColumn('uuid')
@@ -32,7 +22,4 @@ export class ProdutoEntity {
     
     @Column({ name: 'categoria', length: 100, nullable: false })
     categoria: string;
-    
-    caracteristicas: CaracteristicaProduto[];
-    imagens: ImagemProduto[];
 }

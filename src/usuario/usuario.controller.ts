@@ -5,11 +5,15 @@ import { UsuarioEntity } from './usuario.entity';
 import {v4 as uuid} from 'uuid';
 import { ListaUsuario } from './dto/lista.usuario.dto';
 import { AtualizaUsuarioDTO } from './dto/atualiza.usuario.dto';
+import { UsuarioService } from './usuario.service';
 
 @Controller('/usuarios')
 export class UsuarioController {
   
-  constructor(private usuarioRepository: UsuarioRepository) {}
+  constructor(
+    private usuarioRepository: UsuarioRepository,
+    private readonly usuarioService: UsuarioService
+  ) {}
   
   @Post()
   async criaUsuario(@Body() dadosDoUsuario: CriaUsuarioDTO) {
@@ -19,7 +23,7 @@ export class UsuarioController {
     usuarioEntity.senha = dadosDoUsuario.senha;
     usuarioEntity.id = uuid();
 
-    this.usuarioRepository.salvar(usuarioEntity);
+    this.usuarioService.criaUsuario(usuarioEntity);
     return {
       usuario: new ListaUsuario(usuarioEntity.id, usuarioEntity.nome),
       mensagem: 'Usuario criado com sucesso!'
@@ -28,20 +32,13 @@ export class UsuarioController {
 
   @Get()
   async listaUsuarios() {
-    const usuariosSalvos = await this.usuarioRepository.listar();
-    const usuarioLista = usuariosSalvos.map(
-      usuario => new ListaUsuario(
-        usuario.id,
-        usuario.nome
-      )
-    )
-
-    return usuarioLista
+    const usuariosSalvos = await this.usuarioService.listaUsuario();
+    return usuariosSalvos
   }
 
   @Put('/:id')
   async atualizaUsuario(@Param('id') id: string, @Body() novosDados: AtualizaUsuarioDTO) {
-    const usuarioAtualizado = await this.usuarioRepository.atualiza(id, novosDados)
+    const usuarioAtualizado = await this.usuarioService.atualizaUsuario(id, novosDados)
 
     return {
       usuario: usuarioAtualizado,
@@ -51,7 +48,7 @@ export class UsuarioController {
 
   @Delete('/:id')
   async deletaUsuario(@Param('id') id: string) {
-    const usuarioDeletado = await this.usuarioRepository.deleta(id)
+    const usuarioDeletado = await this.usuarioService.deletaUsuario(id)
 
     return {
       usuario: usuarioDeletado,
